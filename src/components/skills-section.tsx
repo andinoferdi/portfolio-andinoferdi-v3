@@ -91,7 +91,11 @@ export default function SkillsSection() {
               }}
               className="card-3d"
             >
-              <Card className="overflow-hidden border-0 shadow-lg">
+              <Card
+                className="overflow-hidden border-0 shadow-lg"
+                data-aos="fade-up"
+                data-aos-delay={index * 100}
+              >
                 <div className={`absolute inset-0 bg-gradient-to-br ${skill.color} opacity-10`} />
                 <CardContent className="p-6 relative">
                   <div className="mb-4 flex items-center gap-4">
