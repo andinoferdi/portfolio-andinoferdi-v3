@@ -51,13 +51,48 @@
 
 @layer base {
   * {
-    @apply border-[hsl(var(--border))];
+    border-color: hsl(var(--border));
+    transition: background-color 150ms ease-out, color 150ms ease-out,
+      border-color 150ms ease-out, box-shadow 150ms ease-out;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    transition: background-color 150ms ease-out, color 150ms ease-out;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    perspective: 1000;
+    contain: layout paint style;
   }
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Optimize text elements specifically */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  span,
+  a,
+  button,
+  li {
+    transition: color 150ms ease-out;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    perspective: 1000;
   }
 }
 
@@ -76,8 +111,7 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-shadow: 0 0 10px rgba(238, 119, 82, 0.3),
-               0 0 20px rgba(231, 60, 126, 0.2),
-               0 0 30px rgba(35, 166, 213, 0.1);
+    0 0 20px rgba(231, 60, 126, 0.2), 0 0 30px rgba(35, 166, 213, 0.1);
 }
 
 .gradient-border {
@@ -131,9 +165,8 @@
 .shine {
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 10px rgba(238, 119, 82, 0.3),
-              0 0 20px rgba(231, 60, 126, 0.2),
-              0 0 30px rgba(35, 166, 213, 0.1);
+  box-shadow: 0 0 10px rgba(238, 119, 82, 0.3), 0 0 20px rgba(231, 60, 126, 0.2),
+    0 0 30px rgba(35, 166, 213, 0.1);
 }
 
 .shine::after {
@@ -164,16 +197,19 @@
 
 /* Glow effect */
 .glow {
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+    0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.1);
   animation: glow 2s ease-in-out infinite alternate;
 }
 
 @keyframes glow {
   from {
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5),
+      0 0 20px rgba(255, 255, 255, 0.3), 0 0 30px rgba(255, 255, 255, 0.1);
   }
   to {
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6),
+      0 0 30px rgba(255, 255, 255, 0.4), 0 0 40px rgba(255, 255, 255, 0.2);
   }
 }
 

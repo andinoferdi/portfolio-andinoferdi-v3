@@ -1,15 +1,22 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Code, Globe, Palette, Server } from "lucide-react"
-import { useRef, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Code, Globe, Palette, Server } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
 
 const skills = [
   {
     title: "Frontend Development",
-    description: "Creating responsive and interactive user interfaces with modern frameworks",
+    description:
+      "Creating responsive and interactive user interfaces with modern frameworks",
     icon: <Globe className="h-8 w-8" />,
-    technologies: ["React", "Next.js", "TypeScript", "Tailwind CSS", "HTML/CSS"],
+    technologies: [
+      "React",
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "HTML/CSS",
+    ],
     color: "from-blue-500 to-cyan-400",
   },
   {
@@ -21,52 +28,83 @@ const skills = [
   },
   {
     title: "UI/UX Design",
-    description: "Designing intuitive and aesthetically pleasing user experiences",
+    description:
+      "Designing intuitive and aesthetically pleasing user experiences",
     icon: <Palette className="h-8 w-8" />,
-    technologies: ["Figma", "Adobe XD", "Responsive Design", "Wireframing", "Prototyping"],
+    technologies: [
+      "Figma",
+      "Adobe XD",
+      "Responsive Design",
+      "Wireframing",
+      "Prototyping",
+    ],
     color: "from-purple-500 to-pink-400",
   },
   {
     title: "Other Skills",
     description: "Additional technical skills and tools",
     icon: <Code className="h-8 w-8" />,
-    technologies: ["Git", "Docker", "CI/CD", "Testing", "Performance Optimization"],
+    technologies: [
+      "Git",
+      "Docker",
+      "CI/CD",
+      "Testing",
+      "Performance Optimization",
+    ],
     color: "from-amber-500 to-orange-400",
   },
-]
+];
 
 export default function SkillsSection() {
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const cardsRef = useRef<(HTMLDivElement | null)[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Only apply 3D effect on non-mobile devices
+    if (isMobile) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       cardsRef.current.forEach((card) => {
-        if (!card) return
+        if (!card) return;
 
-        const rect = card.getBoundingClientRect()
-        const x = e.clientX - rect.left
-        const y = e.clientY - rect.top
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
 
-        const centerX = rect.width / 2
-        const centerY = rect.height / 2
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
 
-        const rotateX = (y - centerY) / 10
-        const rotateY = (centerX - x) / 10
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
 
         // Only apply the effect when mouse is over the card
         if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`
-          card.style.transition = "transform 0.1s"
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+          card.style.transition = "transform 0.1s";
         } else {
-          card.style.transform = "perspective(1000px) rotateX(0) rotateY(0)"
-          card.style.transition = "transform 0.5s"
+          card.style.transform = "perspective(1000px) rotateX(0) rotateY(0)";
+          card.style.transition = "transform 0.5s";
         }
-      })
-    }
+      });
+    };
 
-    document.addEventListener("mousemove", handleMouseMove)
-    return () => document.removeEventListener("mousemove", handleMouseMove)
-  }, [])
+    document.addEventListener("mousemove", handleMouseMove);
+    return () => document.removeEventListener("mousemove", handleMouseMove);
+  }, [isMobile]);
 
   return (
     <section id="skills" className="container py-12 md:py-24 relative">
@@ -76,8 +114,12 @@ export default function SkillsSection() {
 
       <div className="mx-auto max-w-5xl relative z-10">
         <div className="mb-12 text-center" data-aos="fade-up">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl gradient-text">My Skills</h2>
-          <p className="mt-4 text-muted-foreground">Here are some of the technologies and tools I work with</p>
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl gradient-text">
+            My Skills
+          </h2>
+          <p className="mt-4 text-muted-foreground">
+            Here are some of the technologies and tools I work with
+          </p>
         </div>
         <div className="grid gap-6 sm:grid-cols-2">
           {skills.map((skill, index) => (
@@ -89,21 +131,25 @@ export default function SkillsSection() {
                 cardsRef.current[index] = el;
                 return undefined;
               }}
-              className="card-3d"
+              className={`${isMobile ? "" : "card-3d"} h-full`}
             >
-              <Card
-                className="overflow-hidden border-0 shadow-lg"
-                data-aos="fade-up"
-                data-aos-delay={index * 100}
-              >
-                <div className={`absolute inset-0 bg-gradient-to-br ${skill.color} opacity-10`} />
-                <CardContent className="p-6 relative">
+              <Card className="overflow-hidden border-0 shadow-lg h-full flex flex-col">
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${skill.color} opacity-10`}
+                />
+                <CardContent className="p-6 relative flex flex-col h-full">
                   <div className="mb-4 flex items-center gap-4">
-                    <div className={`rounded-full bg-gradient-to-br ${skill.color} p-2 text-white`}>{skill.icon}</div>
+                    <div
+                      className={`rounded-full bg-gradient-to-br ${skill.color} p-2 text-white`}
+                    >
+                      {skill.icon}
+                    </div>
                     <h3 className="text-xl font-bold">{skill.title}</h3>
                   </div>
-                  <p className="mb-4 text-muted-foreground">{skill.description}</p>
-                  <div className="flex flex-wrap gap-2">
+                  <p className="mb-4 text-muted-foreground flex-grow">
+                    {skill.description}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-auto">
                     {skill.technologies.map((tech, techIndex) => (
                       <span
                         key={techIndex}
@@ -120,5 +166,5 @@ export default function SkillsSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

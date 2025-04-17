@@ -1,64 +1,180 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import Image from "next/image"
-import { useEffect, useRef } from "react"
+import { useRef, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
+import Link from "next/link";
 
 export default function AboutSection() {
-  const imageRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isSwapped, setIsSwapped] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  useEffect(() => {
+    // Only apply parallax effect on desktop
+    if (isMobile) return;
+
     const handleScroll = () => {
-      if (!imageRef.current) return
+      if (!imageRef.current) return;
+      const scrollY = window.scrollY;
+      imageRef.current.style.transform = `translateY(${scrollY * 0.05}px)`;
+    };
 
-      const scrollY = window.scrollY
-      const element = imageRef.current
-      const elementPosition = element.getBoundingClientRect().top + scrollY
-      const offset = scrollY - elementPosition
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isMobile]);
 
-      // Apply rotation based on scroll position
-      if (offset > -500 && offset < 500) {
-        const rotation = offset * 0.05
-        element.style.transform = `rotate(${rotation}deg)`
-      }
-    }
+  // Toggle images when clicked with animation lock
+  const handleSwapImages = () => {
+    if (isAnimating) return; // Prevent clicking during animation
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    setIsAnimating(true);
+    setIsSwapped(!isSwapped);
+
+    // Reset animation lock after transition completes
+    setTimeout(() => {
+      setIsAnimating(false);
+    }, 800);
+  };
 
   return (
-    <section id="about" className="container py-12 md:py-24 relative overflow-hidden">
+    <section id="about" className="container py-12 md:py-24 relative">
       {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-1/4 right-1/4 w-64 h-64 rounded-full bg-pink-500/5 blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/4 w-64 h-64 rounded-full bg-blue-500/5 blur-3xl" />
-      </div>
+      <div className="absolute top-1/3 right-1/4 w-64 h-64 rounded-full bg-blue-500/5 blur-3xl" />
+      <div className="absolute bottom-1/3 left-1/4 w-64 h-64 rounded-full bg-purple-500/5 blur-3xl" />
 
-      <div className="mx-auto grid max-w-5xl items-center gap-8 md:grid-cols-2 relative z-10">
-        <div className="flex justify-center md:order-last" data-aos="fade-left" data-aos-duration="1000">
-          <div ref={imageRef} className="relative h-80 w-80 overflow-hidden rounded-full border-4 border-primary glow" style={{ boxShadow: '0 0 20px 5px rgba(255, 20, 147, 0.5)', filter: 'drop-shadow(0 0 10px rgba(255, 20, 147, 0.7)', borderColor: 'pink' }}>
-            <div className="absolute inset-0 bg-gradient-to-br from-pink-500/20 to-blue-500/20 z-10" />
+      <div className="mx-auto max-w-5xl grid gap-12 md:grid-cols-2 md:gap-16 items-center relative z-10">
+        <div
+          ref={imageRef}
+          data-aos={isMobile ? "fade-in" : "fade-right"}
+          data-aos-duration={isMobile ? 600 : 1000}
+          className="relative h-[350px] md:h-[400px]"
+        >
+          {/* Main Image Container */}
+          <div
+            className={`absolute ${
+              isSwapped
+                ? "-right-4 -bottom-4 w-40 h-40 md:w-48 md:h-48 z-10"
+                : "-inset-4 z-5"
+            } rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 opacity-20 blur transition-all ease-in-out`}
+            style={{
+              transformOrigin: isSwapped ? "bottom right" : "center",
+              transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
+          />
+
+          {/* Profile Image Container */}
+          <div
+            className={`absolute overflow-hidden rounded-lg bg-background border border-white/10 shadow-xl cursor-pointer ${
+              isSwapped
+                ? "w-40 h-40 md:w-48 md:h-48 -right-4 -bottom-4 z-30"
+                : "w-full h-full left-0 top-0 z-10"
+            }`}
+            onClick={handleSwapImages}
+            style={{
+              transformOrigin: isSwapped ? "bottom right" : "center",
+              transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
+          >
             <Image
-              src="/placeholder.svg?height=320&width=320"
+              src="/profile.jpg"
               alt="Andino Ferdi"
               fill
               className="object-cover"
-              priority
             />
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10" />
+
+            {/* Add experience text to profile image when it's small */}
+            {isSwapped && (
+              <div
+                className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white"
+                style={{
+                  transition: "opacity 0.6s ease-in-out",
+                }}
+              >
+                <div className="text-3xl md:text-4xl font-bold">8+</div>
+                <div className="text-xs md:text-sm text-center px-1">
+                  Projects Completed
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Secondary Image Container with neon effect */}
+          <div
+            className={`absolute cursor-pointer overflow-hidden rounded-lg border-2 border-white/30 bg-background/80 backdrop-blur-sm ${
+              isSwapped
+                ? "w-full h-full left-0 top-0 z-10"
+                : "w-40 h-40 md:w-48 md:h-48 -right-4 -bottom-4 z-30"
+            }`}
+            onClick={handleSwapImages}
+            style={{
+              boxShadow:
+                "0 0 20px 3px rgba(147, 51, 234, 0.6), 0 0 8px 2px rgba(79, 70, 229, 0.4) inset",
+              transformOrigin: isSwapped ? "center" : "bottom right",
+              transition: "all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)",
+            }}
+          >
+            <div className="relative w-full h-full">
+              <Image
+                src="/experience.jpg"
+                alt="Experience"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/30 to-blue-500/30" />
+
+              {/* Only show experience text on the small box */}
+              {!isSwapped && (
+                <div
+                  className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white"
+                  style={{
+                    transition: "opacity 0.6s ease-in-out",
+                  }}
+                >
+                  <div className="text-3xl md:text-4xl font-bold">5+</div>
+                  <div className="text-xs md:text-sm text-center px-1">
+                    Years of Experience
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4" data-aos="fade-right" data-aos-duration="1000">
-          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl gradient-text">About Me</h2>
+
+        <div
+          className="flex flex-col gap-4"
+          data-aos={isMobile ? "fade-in" : "fade-left"}
+          data-aos-duration={isMobile ? 600 : 1000}
+        >
+          <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl gradient-text">
+            About Me
+          </h2>
           <p className="text-muted-foreground">
-            I&apos;m a passionate developer with a strong focus on creating clean, efficient, and user-friendly
-            applications. With years of experience in web development, I specialize in building modern websites and
-            applications using the latest technologies.
+            I&apos;m a passionate developer with a strong focus on creating
+            clean, efficient, and user-friendly applications. With years of
+            experience in web development, I specialize in building modern
+            websites and applications using the latest technologies.
           </p>
           <p className="text-muted-foreground">
-            When I&apos;m not coding, you can find me exploring new technologies, contributing to open-source projects,
-            or enjoying outdoor activities.
+            When I&apos;m not coding, you can find me exploring new
+            technologies, contributing to open-source projects, or enjoying
+            outdoor activities.
           </p>
           <div className="flex gap-4 mt-4">
             <div className="relative">
@@ -70,7 +186,11 @@ export default function AboutSection() {
                 <Link href="#contact">Get in Touch</Link>
               </Button>
             </div>
-            <Button variant="outline" asChild className="backdrop-blur-sm bg-background/50 border-white/20">
+            <Button
+              variant="outline"
+              asChild
+              className="backdrop-blur-sm bg-background/50 border-white/20"
+            >
               <a href="/resume.pdf" target="_blank" rel="noopener noreferrer">
                 Download CV
               </a>
@@ -79,5 +199,5 @@ export default function AboutSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
